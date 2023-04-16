@@ -4,17 +4,18 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mindorks.kotlinFlow.data.api.ApiHelper
-import com.mindorks.kotlinFlow.data.local.DatabaseHelper
-import com.mindorks.kotlinFlow.data.model.ApiUser
-import com.mindorks.kotlinFlow.utils.Resource
+import com.digalyst.myapplication.data.api.ApiHelper
+import com.digalyst.myapplication.data.model.ApiUser
+import com.digalyst.myapplication.repo.Resource
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class EmitAllViewModel(
+@HiltViewModel
+class EmitAllViewModel @Inject constructor(
     private val apiHelper: ApiHelper,
-    private val dbHelper: DatabaseHelper
 ) : ViewModel() {
 
     private val users = MutableLiveData<Resource<List<ApiUser>>>()
@@ -25,7 +26,7 @@ class EmitAllViewModel(
 
     private fun fetchUsers() {
         viewModelScope.launch {
-            users.postValue(Resource.loading(null))
+            users.postValue(Resource.Loading)
             apiHelper.getUsers()
                 .zip(
                     apiHelper.getUsersWithError()
@@ -37,10 +38,10 @@ class EmitAllViewModel(
                 }
                 .flowOn(Dispatchers.Default)
                 .catch { e ->
-                    users.postValue(Resource.error(e.toString(), null))
+                    users.postValue(Resource.Fail(e))
                 }
                 .collect {
-                    users.postValue(Resource.success(it))
+                    users.postValue(Resource.Success(it))
                 }
         }
     }

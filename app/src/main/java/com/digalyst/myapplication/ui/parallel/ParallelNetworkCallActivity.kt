@@ -1,4 +1,4 @@
-package com.digalyst.myapplication.ui.singlenetworkcall
+package com.digalyst.myapplication.ui.parallel
 
 import android.os.Bundle
 import android.view.View
@@ -11,12 +11,13 @@ import com.digalyst.myapplication.base.ApiUserAdapter
 import com.digalyst.myapplication.data.model.ApiUser
 import com.digalyst.myapplication.databinding.ActivitySingleNetworkCallBinding
 import com.digalyst.myapplication.repo.Resource
+import com.mindorks.kotlinFlow.learn.retrofit.parallel.ParallelNetworkCallsViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class SingleNetworkCallActivity : AppCompatActivity() {
+class ParallelNetworkCallActivity : AppCompatActivity() {
     lateinit var binding: ActivitySingleNetworkCallBinding
-    private val viewModel: SingleNetworkCallViewModel by viewModels()
+    private val viewModel: ParallelNetworkCallsViewModel by viewModels()
     private lateinit var adapter: ApiUserAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,7 +30,7 @@ class SingleNetworkCallActivity : AppCompatActivity() {
 
     private fun setupUI() {
         binding.apply {
-            recyclerView.layoutManager = LinearLayoutManager(this@SingleNetworkCallActivity)
+            recyclerView.layoutManager = LinearLayoutManager(this@ParallelNetworkCallActivity)
             adapter =
                 ApiUserAdapter(
                     arrayListOf()

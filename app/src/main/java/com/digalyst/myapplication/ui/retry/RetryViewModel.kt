@@ -1,29 +1,29 @@
-package com.mindorks.kotlinFlow.learn.retry
+package com.digalyst.myapplication.ui.retry
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mindorks.kotlinFlow.data.api.ApiHelper
-import com.mindorks.kotlinFlow.data.local.DatabaseHelper
-import com.mindorks.kotlinFlow.utils.Resource
+import com.digalyst.myapplication.data.api.ApiHelper
+import com.digalyst.myapplication.repo.Resource
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.io.IOException
+import javax.inject.Inject
 
-class RetryViewModel(
+@HiltViewModel
+class RetryViewModel @Inject constructor(
     val apiHelper: ApiHelper,
-    dbHelper: DatabaseHelper
 ) : ViewModel() {
 
     private val status = MutableLiveData<Resource<String>>()
 
     fun startTask() {
         viewModelScope.launch {
-            status.postValue(Resource.loading(null))
-            // do a long running task
+            status.postValue(Resource.Loading)
             doLongRunningTask()
                 .flowOn(Dispatchers.Default)
                 .retry(retries = 3) { cause ->
@@ -35,10 +35,10 @@ class RetryViewModel(
                     }
                 }
                 .catch {
-                    status.postValue(Resource.error("Something Went Wrong", null))
+                    status.postValue(Resource.Fail(Throwable("Something Went Wrong")))
                 }
                 .collect {
-                    status.postValue(Resource.success("Task Completed"))
+                    status.postValue(Resource.Success("Task Completed"))
                 }
         }
     }

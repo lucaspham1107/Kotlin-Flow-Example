@@ -1,20 +1,20 @@
-package com.mindorks.kotlinFlow.learn.errorhandling.catch
+package com.digalyst.myapplication.ui.errorhandling.catch
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mindorks.kotlinFlow.data.api.ApiHelper
-import com.mindorks.kotlinFlow.data.local.DatabaseHelper
-import com.mindorks.kotlinFlow.data.model.ApiUser
-import com.mindorks.kotlinFlow.utils.Resource
+import com.digalyst.myapplication.data.api.ApiHelper
+import com.digalyst.myapplication.data.model.ApiUser
+import com.digalyst.myapplication.repo.Resource
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class CatchViewModel(
+@HiltViewModel
+class CatchViewModel @Inject constructor(
     private val apiHelper: ApiHelper,
-    private val dbHelper: DatabaseHelper
 ) : ViewModel() {
 
     private val users = MutableLiveData<Resource<List<ApiUser>>>()
@@ -25,13 +25,13 @@ class CatchViewModel(
 
     private fun fetchUsers() {
         viewModelScope.launch {
-            users.postValue(Resource.loading(null))
+            users.postValue(Resource.Loading)
             apiHelper.getUsersWithError()
                 .catch { e ->
-                    users.postValue(Resource.error(e.toString(), null))
+                    users.postValue(Resource.Fail(e))
                 }
                 .collect {
-                    users.postValue(Resource.success(it))
+                    users.postValue(Resource.Success(it))
                 }
         }
     }

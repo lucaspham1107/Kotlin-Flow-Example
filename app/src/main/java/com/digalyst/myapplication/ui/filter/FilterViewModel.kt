@@ -1,26 +1,26 @@
-package com.mindorks.kotlinFlow.learn.filter
+package com.digalyst.myapplication.ui.filter
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mindorks.kotlinFlow.data.api.ApiHelper
-import com.mindorks.kotlinFlow.data.local.DatabaseHelper
-import com.mindorks.kotlinFlow.utils.Resource
+import com.digalyst.myapplication.data.api.ApiHelper
+import com.digalyst.myapplication.repo.Resource
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class FilterViewModel(
-    apiHelper: ApiHelper,
-    dbHelper: DatabaseHelper
+@HiltViewModel
+class FilterViewModel @Inject constructor(
 ) : ViewModel() {
     private val status = MutableLiveData<Resource<String>>()
 
     fun startFilterTask() {
         viewModelScope.launch {
-            status.postValue(Resource.loading(null))
+            status.postValue(Resource.Loading)
             val result = mutableListOf<Int>()
             (1..5).asFlow()
                 .filter {
@@ -28,7 +28,7 @@ class FilterViewModel(
                 }
                 .toList(result)
 
-            status.postValue(Resource.success(result.toString()))
+            status.postValue(Resource.Success(result.toString()))
         }
     }
 

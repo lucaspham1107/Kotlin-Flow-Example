@@ -1,69 +1,70 @@
-package com.mindorks.kotlinFlow.learn.errorhandling.emitall
+package com.digalyst.myapplication.ui.errorhandling.emitall
 
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.mindorks.kotlinFlow.R
-import com.mindorks.kotlinFlow.data.api.ApiHelperImpl
-import com.mindorks.kotlinFlow.data.api.RetrofitBuilder
-import com.mindorks.kotlinFlow.data.local.DatabaseBuilder
-import com.mindorks.kotlinFlow.data.local.DatabaseHelperImpl
-import com.mindorks.kotlinFlow.data.model.ApiUser
-import com.mindorks.kotlinFlow.learn.base.ApiUserAdapter
-import com.mindorks.kotlinFlow.utils.Status
-import com.mindorks.kotlinFlow.utils.ViewModelFactory
-import kotlinx.android.synthetic.main.activity_recycler_view.*
+import com.digalyst.myapplication.base.ApiUserAdapter
+import com.digalyst.myapplication.data.model.ApiUser
+import com.digalyst.myapplication.databinding.ActivityRecyclerViewBinding
+import com.digalyst.myapplication.repo.Resource
+import com.mindorks.kotlinFlow.learn.errorhandling.emitall.EmitAllViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class EmitAllActivity : AppCompatActivity() {
 
-    private lateinit var viewModel: EmitAllViewModel
+    lateinit var binding: ActivityRecyclerViewBinding
+    private  val viewModel: EmitAllViewModel by viewModels()
     private lateinit var adapter: ApiUserAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_recycler_view)
+        binding = ActivityRecyclerViewBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         setupUI()
-        setupViewModel()
         setupObserver()
     }
 
     private fun setupUI() {
-        recyclerView.layoutManager = LinearLayoutManager(this)
-        adapter =
-            ApiUserAdapter(
-                arrayListOf()
+        binding.apply {
+            recyclerView.layoutManager = LinearLayoutManager(this@EmitAllActivity)
+            adapter =
+                ApiUserAdapter(
+                    arrayListOf()
+                )
+            recyclerView.addItemDecoration(
+                DividerItemDecoration(
+                    recyclerView.context,
+                    (recyclerView.layoutManager as LinearLayoutManager).orientation
+                )
             )
-        recyclerView.addItemDecoration(
-            DividerItemDecoration(
-                recyclerView.context,
-                (recyclerView.layoutManager as LinearLayoutManager).orientation
-            )
-        )
-        recyclerView.adapter = adapter
+            recyclerView.adapter = adapter
+        }
     }
 
     private fun setupObserver() {
         viewModel.getUsers().observe(this, Observer {
-            when (it.status) {
-                Status.SUCCESS -> {
-                    progressBar.visibility = View.GONE
-                    it.data?.let { users -> renderList(users) }
-                    recyclerView.visibility = View.VISIBLE
+            when (it) {
+                is Resource.Success -> {
+                    binding.progressBar.visibility = View.GONE
+                    it.valueOrNull?.let { users -> renderList(users) }
+                    binding.recyclerView.visibility = View.VISIBLE
                 }
-                Status.LOADING -> {
-                    progressBar.visibility = View.VISIBLE
-                    recyclerView.visibility = View.GONE
+                is Resource.Loading -> {
+                    binding.progressBar.visibility = View.VISIBLE
+                    binding.recyclerView.visibility = View.GONE
                 }
-                Status.ERROR -> {
+                is Resource.Fail -> {
                     //Handle Error
-                    progressBar.visibility = View.GONE
-                    Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
+                    binding.progressBar.visibility = View.GONE
+                    Toast.makeText(this, it.error.message, Toast.LENGTH_SHORT).show()
                 }
+                else -> Unit
             }
         })
     }
@@ -73,13 +74,4 @@ class EmitAllActivity : AppCompatActivity() {
         adapter.notifyDataSetChanged()
     }
 
-    private fun setupViewModel() {
-        viewModel = ViewModelProviders.of(
-            this,
-            ViewModelFactory(
-                ApiHelperImpl(RetrofitBuilder.apiService),
-                DatabaseHelperImpl(DatabaseBuilder.getInstance(applicationContext))
-            )
-        ).get(EmitAllViewModel::class.java)
-    }
 }

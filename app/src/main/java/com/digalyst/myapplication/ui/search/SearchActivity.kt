@@ -1,16 +1,16 @@
-package com.mindorks.kotlinFlow.learn.search
+package com.digalyst.myapplication.ui.search
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.mindorks.kotlinFlow.R
-import com.mindorks.kotlinFlow.utils.getQueryTextChangeStateFlow
-import kotlinx.android.synthetic.main.activity_search.*
+import com.digalyst.myapplication.databinding.ActivitySearchBinding
+import com.digalyst.myapplication.utils.getQueryTextChangeStateFlow
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlin.coroutines.CoroutineContext
 
 class SearchActivity : AppCompatActivity(), CoroutineScope {
 
+    lateinit var binding: ActivitySearchBinding
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Main + job
 
@@ -18,7 +18,8 @@ class SearchActivity : AppCompatActivity(), CoroutineScope {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_search)
+        binding = ActivitySearchBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         job = Job()
         setUpSearchStateFlow()
     }
@@ -29,29 +30,32 @@ class SearchActivity : AppCompatActivity(), CoroutineScope {
     }
 
     private fun setUpSearchStateFlow() {
-        launch {
-            searchView.getQueryTextChangeStateFlow()
-                .debounce(300)
-                .filter { query ->
-                    if (query.isEmpty()) {
-                        textViewResult.text = ""
-                        return@filter false
-                    } else {
-                        return@filter true
-                    }
-                }
-                .distinctUntilChanged()
-                .flatMapLatest { query ->
-                    dataFromNetwork(query)
-                        .catch {
-                            emitAll(flowOf(""))
+        binding.apply {
+            launch {
+                searchView.getQueryTextChangeStateFlow()
+                    .debounce(300)
+                    .filter { query ->
+                        if (query.isEmpty()) {
+                            textViewResult.text = ""
+                            return@filter false
+                        } else {
+                            return@filter true
                         }
-                }
-                .flowOn(Dispatchers.Default)
-                .collect { result ->
-                    textViewResult.text = result
-                }
+                    }
+                    .distinctUntilChanged()
+                    .flatMapLatest { query ->
+                        dataFromNetwork(query)
+                            .catch {
+                                emitAll(flowOf(""))
+                            }
+                    }
+                    .flowOn(Dispatchers.Default)
+                    .collect { result ->
+                        textViewResult.text = result
+                    }
+            }
         }
+
     }
 
     /**

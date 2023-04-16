@@ -1,37 +1,38 @@
-package com.mindorks.kotlinFlow.learn.task.twotasks
+package com.digalyst.myapplication.ui.task.twotasks
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mindorks.kotlinFlow.data.api.ApiHelper
-import com.mindorks.kotlinFlow.data.local.DatabaseHelper
-import com.mindorks.kotlinFlow.utils.Resource
+import com.digalyst.myapplication.data.api.ApiHelper
+import com.digalyst.myapplication.repo.Resource
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class TwoLongRunningTasksViewModel(
+@HiltViewModel
+class TwoLongRunningTasksViewModel @Inject constructor(
     private val apiHelper: ApiHelper,
-    private val dbHelper: DatabaseHelper
 ) : ViewModel() {
 
     private val status = MutableLiveData<Resource<String>>()
 
     fun startLongRunningTask() {
         viewModelScope.launch {
-            status.postValue(Resource.loading(null))
+            status.postValue(Resource.Loading)
             doLongRunningTaskOne()
                 .zip(doLongRunningTaskTwo()) { resultOne, resultTwo ->
                     return@zip resultOne + resultTwo
                 }
                 .flowOn(Dispatchers.Default)
                 .catch { e ->
-                    status.postValue(Resource.error(e.toString(), null))
+                    status.postValue(Resource.Fail(e))
                 }
                 .collect {
-                    status.postValue(Resource.success(it))
+                    status.postValue(Resource.Success(it))
                 }
         }
     }

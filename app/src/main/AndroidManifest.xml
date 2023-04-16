@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-    <uses-permission android:name="android.permission.INTERNET" />
 
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:name=".MyApplication"
@@ -16,7 +16,45 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".ui.map.MapActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.filter.FilterActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.completion.CompletionActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.errorhandling.emitall.EmitAllActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.task.onetask.LongRunningTaskActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.task.twotasks.TwoLongRunningTasksActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.errorhandling.catch.CatchActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.search.SearchActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.retry.RetryActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.retrywhen.RetryWhenActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.singlenetworkcall.SingleNetworkCallActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.parallel.ParallelNetworkCallActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.series.SeriesNetworkCallActivity"
             android:exported="false" />
         <activity
             android:name=".ui.MainActivity"

@@ -1,35 +1,39 @@
-package com.mindorks.kotlinFlow.learn.task.onetask
+package com.digalyst.myapplication.ui.task.onetask
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mindorks.kotlinFlow.data.api.ApiHelper
-import com.mindorks.kotlinFlow.data.local.DatabaseHelper
-import com.mindorks.kotlinFlow.utils.Resource
+import com.digalyst.myapplication.data.api.ApiHelper
+import com.digalyst.myapplication.repo.Resource
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class LongRunningTaskViewModel(
+@HiltViewModel
+class LongRunningTaskViewModel @Inject constructor(
     private val apiHelper: ApiHelper,
-    private val dbHelper: DatabaseHelper
 ) : ViewModel() {
 
     private val status = MutableLiveData<Resource<String>>()
 
     fun startLongRunningTask() {
         viewModelScope.launch {
-            status.postValue(Resource.loading(null))
+            status.postValue(Resource.Loading)
             // do a long running task
             doLongRunningTask()
                 .flowOn(Dispatchers.Default)
                 .catch {
-                    status.postValue(Resource.error("Something Went Wrong", null))
+                    status.postValue(Resource.Fail(Throwable("Something Went Wrong")))
                 }
                 .collect {
-                    status.postValue(Resource.success("Task Completed"))
+                    status.postValue(Resource.Success("Task Completed"))
                 }
         }
     }

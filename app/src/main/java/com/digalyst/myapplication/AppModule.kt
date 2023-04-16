@@ -6,6 +6,7 @@ import com.digalyst.myapplication.data.api.ApiHelper
 import com.digalyst.myapplication.data.api.ApiHelperImpl
 import com.digalyst.myapplication.data.api.ApiService
 import com.digalyst.myapplication.data.local.AppDatabase
+import com.digalyst.myapplication.data.local.DatabaseHelper
 import com.digalyst.myapplication.data.local.dao.UserDao
 import com.ihsanbal.logging.Level
 import com.ihsanbal.logging.LoggingInterceptor
@@ -74,4 +75,8 @@ object AppModule {
     @Provides
     @Singleton
     fun provideApiHelper(apiHelper: ApiHelperImpl): ApiHelper = apiHelper
+
+    @Provides
+    @Singleton
+    fun provideDatabaseHelper(databaseHelper: DatabaseHelper): DatabaseHelper = databaseHelper
 }

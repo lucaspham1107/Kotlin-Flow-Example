@@ -46,9 +46,6 @@ class SingleNetworkCallActivity : AppCompatActivity() {
 
     private fun setupObserver() {
         viewModel.getUsers().observe(this) {
-            binding.apply {
-
-            }
             when (it) {
                 is Resource.Success -> {
                     binding.progressBar.visibility = View.GONE

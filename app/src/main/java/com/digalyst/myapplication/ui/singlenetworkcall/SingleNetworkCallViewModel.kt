@@ -10,12 +10,14 @@ import com.digalyst.myapplication.repo.RepositoryImpl
 import com.digalyst.myapplication.repo.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class SingleNetworkCallViewModel @Inject constructor(
-    private val repositoryImpl: RepositoryImpl,
     private val apiHelper: ApiHelper
 ) : ViewModel() {
 

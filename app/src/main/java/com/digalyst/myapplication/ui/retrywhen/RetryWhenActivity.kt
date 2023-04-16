@@ -1,4 +1,4 @@
-package com.mindorks.kotlinFlow.learn.retry
+package com.digalyst.myapplication.ui.retrywhen
 
 import android.os.Bundle
 import android.view.View
@@ -11,10 +11,10 @@ import com.digalyst.myapplication.repo.Resource
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class RetryActivity : AppCompatActivity() {
+class RetryWhenActivity : AppCompatActivity() {
 
     lateinit var binding: ActivityRetryBinding
-    private val viewModel: RetryViewModel by viewModels()
+    private val viewModel: RetryWhenViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
