@@ -7,12 +7,14 @@ import com.digalyst.myapplication.data.api.ApiHelperImpl
 import com.digalyst.myapplication.data.api.ApiService
 import com.digalyst.myapplication.data.local.AppDatabase
 import com.digalyst.myapplication.data.local.dao.UserDao
-import com.digalyst.myapplication.repo.Repository
+import com.ihsanbal.logging.Level
+import com.ihsanbal.logging.LoggingInterceptor
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
+import okhttp3.internal.platform.Platform
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -31,26 +33,17 @@ object AppModule {
         return appDatabase.myDao()
     }
 
-
-    @Provides
-    @Singleton
-    fun provideRepository(
-        myDao: UserDao,
-        app: Application
-    ): Repository = RepositoryImpl(
-        application = app
-    )
-
     @Provides
     fun provideBaseUrl() = "https://5e510330f2c0d300147c034c.mockapi.io/"
 
     @Singleton
     @Provides
-    fun provideOkHttpClient() : OkHttpClient {
-        val loggingInterceptor = HttpLoggingInterceptor()
-        loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
+    fun provideOkHttpClient(loggingInterceptor: LoggingInterceptor) : OkHttpClient {
+        val httpInterceptor = HttpLoggingInterceptor()
+        httpInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
         return OkHttpClient.Builder()
             .addInterceptor(loggingInterceptor)
+            .addInterceptor(httpInterceptor)
             .build()
     }
 
@@ -62,6 +55,17 @@ object AppModule {
         .baseUrl(BASE_URL)
         .client(okHttpClient)
         .build()
+
+    @Provides
+    @Singleton
+    fun provideLoggingInterceptorLevelBody(): LoggingInterceptor {
+        return LoggingInterceptor.Builder()
+            .setLevel(Level.BASIC)
+            .log(Platform.INFO)
+            .request(String.format("%s-Request", "FLOW-DEMO"))
+            .response(String.format("%s-Response", "FLOW-DEMO"))
+            .build()
+    }
 
     @Provides
     @Singleton
